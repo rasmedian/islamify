@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Quiz Challenge - Rasmedian Network</title>
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --emerald-primary: #064e3b;
+            --emerald-secondary: #047857;
+            --emerald-light: #ecfdf5;
+            --emerald-accent: #10b981;
+            --gold: #d97706;
+            --bg-light: #f3f4f6;
+            --text-dark: #1f2937;
+            --white: #ffffff;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--emerald-primary), var(--emerald-secondary));
+            color: var(--white);
+            text-align: center;
+            padding: 1.25rem 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.25rem;
+        }
+
+        header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* User Header Bar */
+        .user-header-bar {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: #fef08a;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .user-header-bar .logout-link {
+            color: #ffffff;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 92%;
+            margin: 1.5rem auto;
+            flex: 1;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--emerald-secondary);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--emerald-primary);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--emerald-secondary);
+            border: 2px solid var(--emerald-secondary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--emerald-secondary);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background-color: #991b1b;
+        }
+
+        /* Dashboard & Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: var(--emerald-light);
+            border-left: 5px solid var(--emerald-accent);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .stat-card h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #047857;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--emerald-primary);
+        }
+
+        /* Stages Grid */
+        .stages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .stage-btn {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            font-weight: bold;
+            cursor: not-allowed;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .stage-btn.unlocked {
+            background-color: var(--white);
+            color: var(--emerald-primary);
+            border-color: var(--emerald-accent);
+            cursor: pointer;
+        }
+
+        .stage-btn.unlocked:hover {
+            background-color: var(--emerald-light);
+            transform: scale(1.05);
+        }
+
+        .stage-btn.completed {
+            background-color: var(--emerald-accent);
+            color: var(--white);
+        }
+
+        .stage-btn span {
+            font-size: 0.75rem;
+            font-weight: normal;
+        }
+
+        /* Quiz Screen & Timer */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--emerald-light);
+        }
+
+        .timer-box {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 2px solid #fca5a5;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .timer-box.warning {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option-btn {
+            background-color: var(--white);
+            border: 2px solid #e5e7eb;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-btn:hover {
+            border-color: var(--emerald-accent);
+            background-color: var(--emerald-light);
+        }
+
+        .option-btn.correct {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .option-btn.incorrect {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .quiz-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        /* Form Controls */
+        .auth-form label {
+            display: block;
+            margin-top: 0.8rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .auth-form input, .auth-form select, .auth-form textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 0.25rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        /* Messaging Styles */
+        .chat-box {
+            max-height: 350px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            background-color: #f9fafb;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .chat-bubble.student {
+            align-self: flex-end;
+            background-color: var(--emerald-secondary);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .chat-bubble.admin {
+            align-self: flex-start;
+            background-color: #e5e7eb;
+            color: var(--text-dark);
+            border-bottom-left-radius: 2px;
+        }
+
+        .chat-meta {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: var(--emerald-primary);
+            padding: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--white);
+            padding: 0.5rem 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        nav button.active {
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.85rem;
+            color: #6b7280;
+            background-color: var(--white);
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Islamic Knowledge Challenge</h1>
+        <p>Rasmedian Network Educational Resource Centre</p>
+    </header>
+
+    <!-- TOP DISPLAY FOR LOGGED-IN STUDENT & POINTS -->
+    <div id="user-header-bar" class="user-header-bar hidden">
+        <div>
+            <span>Student: <strong id="header-student-name">--</strong></span>
+            <span style="margin-left: 10px; color: #ffffff; font-weight: normal;">(<span id="header-student-gender">--</span>)</span>
+        </div>
+        <div>
+            <span>Total Points: <strong id="header-student-points">0</strong></span>
+            <span class="logout-link" onclick="logoutStudent()" style="margin-left: 15px;">Logout</span>
+        </div>
+    </div>
+
+    <nav id="app-nav" class="hidden">
+        <button id="nav-home" class="active" onclick="showScreen('home-screen')">Home</button>
+        <button id="nav-stages" onclick="showScreen('stages-screen')">Stages</button>
+        <button id="nav-trophies" onclick="showScreen('trophies-screen')">Trophies</button>
+        <button id="nav-messages" onclick="showScreen('messages-screen')">Messages</button>
+        <button id="nav-admin" onclick="showScreen('admin-login-screen')">Admin Panel</button>
+    </nav>
+
+    <div class="container">
+
+        <!-- REGISTRATION & LOGIN SCREEN -->
+        <div id="auth-screen" class="card">
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e5e7eb;">
+                <button id="tab-login" class="btn btn-outline" style="flex: 1; border: none; border-bottom: 3px solid var(--emerald-secondary);" onclick="switchAuthTab('login')">Student Login</button>
+                <button id="tab-register" class="btn btn-outline" style="flex: 1; border: none;" onclick="switchAuthTab('register')">New Registration</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="login-form" class="auth-form" onsubmit="event.preventDefault(); handleLogin();">
+                <h2>Welcome Back</h2>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;">Login using your First Name as your username.</p>
+                
+                <label for="login-username">First Name (Username):</label>
+                <input type="text" id="login-username" required placeholder="Enter your first name">
+
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" required placeholder="Enter password">
+
+                <button type="submit" class="btn" style="width: 100%; margin-top: 1.5rem;">Login to Continue</button>
+            </form>
+
+            <!-- REGISTRATION FORM -->
+            <form id="register-form" class="auth-form hidden" onsubmit="event.preventDefault(); handleRegister();">
+                <h2>Student Registration</h2>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;">Your First Name will serve as your unique username.</p>
+
+                <label for="reg-firstname">First Name:</label>
+                <input type="text" id="reg-firstname" required placeholder="e.g. Gabriel">
+
+                <label for="reg-gender">Gender:</label>
+                <select id="reg-gender" required>
+                    <option value="">-- Select Gender --</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+
+                <label for="reg-password">Password:</label>
+                <input type="password" id="reg-password" required placeholder="Create a password">
+
+                <button type="submit" class="btn" style="width: 100%; margin-top: 1.5rem;">Create Account & Register</button>
+            </form>
+        </div>
+
+        <!-- HOME SCREEN -->
+        <div id="home-screen" class="card hidden">
+            <h2>Welcome, <span id="home-welcome-name">Student</span>!</h2>
+            <p style="margin-top: 0.5rem; color: #4b5563;">Test and expand your Islamic knowledge through 40 progressive stages (200 questions).</p>
+            
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <h3>Current Score</h3>
+                    <p id="dash-score">0 / 2000</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Stages Completed</h3>
+                    <p id="dash-stages">0 / 40</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Highest Trophy</h3>
+                    <p id="dash-trophy">None</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; text-align: center;">
+                <button class="btn" style="padding: 1rem 2.5rem; font-size: 1.1rem;" onclick="continueQuiz()">Continue Quiz</button>
+            </div>
+        </div>
+
+        <!-- STAGES SCREEN -->
+        <div id="stages-screen" class="card hidden">
+            <h2>Select a Stage</h2>
+            <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 1rem;">Complete stages sequentially to unlock higher levels.</p>
+            <div class="stages-grid" id="stages-container">
+                <!-- Dynamically generated stage buttons -->
+            </div>
+        </div>
+
+        <!-- QUIZ SCREEN WITH TIMER -->
+        <div id="quiz-screen" class="card hidden">
+            <div class="quiz-header">
+                <div>
+                    <strong id="quiz-stage-title">Stage 1</strong>
+                    <div style="font-size: 0.85rem; color: #6b7280;" id="quiz-progress">Question 1/5</div>
+                </div>
+                <div class="timer-box" id="timer-display">
+                    <span>⏱️</span> <span id="timer-count">30</span>s
+                </div>
+            </div>
+
+            <div class="question-text" id="question-text">
+                Loading Question...
+            </div>
+
+            <div class="options-list" id="options-container">
+                <!-- Dynamically generated option buttons -->
+            </div>
+
+            <div class="quiz-footer">
+                <button class="btn btn-outline" onclick="exitQuiz()">Exit</button>
+                <button id="next-btn" class="btn hidden" onclick="nextQuestion()">Next Question</button>
+            </div>
+        </div>
+
+        <!-- STAGE RESULT SCREEN -->
+        <div id="result-screen" class="card hidden">
+            <div style="text-align: center; padding: 2rem 1rem;">
+                <h2 id="result-title">Stage Completed!</h2>
+                <div style="font-size: 4rem; margin-bottom: 1rem;" id="result-icon">🎯</div>
+                <p style="font-size: 1.2rem; margin-bottom: 0.5rem;" id="result-score">You scored 50 / 50</p>
+                <p id="result-message" style="color: #4b5563; margin-bottom: 1.5rem;">Great job! You have unlocked the next stage.</p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button class="btn btn-outline" onclick="showScreen('stages-screen')">Stages</button>
+                    <button id="next-stage-btn" class="btn" onclick="startNextStage()">Next Stage</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TROPHIES SCREEN -->
+        <div id="trophies-screen" class="card hidden">
+            <h2>Trophy Showcase</h2>
+            <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 1rem;">Earn cumulative points across all 40 stages to unlock trophies.</p>
+            <div id="trophies-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <!-- Dynamically generated trophies -->
+            </div>
+        </div>
+
+        <!-- STUDENT MESSAGES SCREEN -->
+        <div id="messages-screen" class="card hidden">
+            <h2>Messages & Enquiries</h2>
+            <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;">Send direct messages or queries to the Admin support team.</p>
+
+            <div class="chat-box" id="student-chat-box">
+                <!-- Message Bubbles -->
+            </div>
+
+            <form class="auth-form" onsubmit="event.preventDefault(); sendStudentMessage();">
+                <textarea id="student-msg-input" rows="3" required placeholder="Type your message to the Admin..."></textarea>
+                <button type="submit" class="btn" style="margin-top: 0.5rem; width: 100%;">Send Message</button>
+            </form>
+        </div>
+
+        <!-- ADMIN LOGIN SCREEN -->
+        <div id="admin-login-screen" class="card hidden">
+            <h2>Admin Authentication</h2>
+            <div class="auth-form" style="max-width: 400px; margin: 1rem 0;">
+                <label for="admin-pass">Enter Password:</label>
+                <input type="password" id="admin-pass" placeholder="Password">
+                <button class="btn" style="margin-top: 1rem; width: 100%;" onclick="adminLogin()">Login</button>
+            </div>
+        </div>
+
+        <!-- ADMIN PANEL SCREEN -->
+        <div id="admin-panel-screen" class="card hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Admin Control Panel</h2>
+                <button class="btn btn-danger" onclick="adminLogout()">Logout Admin</button>
+            </div>
+            
+            <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e5e7eb;">
+
+            <!-- ADMIN MESSAGES PORTION -->
+            <h3>Student Messages & Inbox</h3>
+            <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.5rem;">Select a student to view and reply to their messages.</p>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="font-weight: 600; font-size: 0.85rem;">Select Student:</label>
+                <select id="admin-student-select" onchange="loadAdminChat()" style="padding: 0.5rem; border-radius: 6px; width: 100%; margin-top: 0.25rem;">
+                    <!-- Dynamically populated student list -->
+                </select>
+            </div>
+
+            <div class="chat-box" id="admin-chat-box">
+                <!-- Admin Chat View -->
+            </div>
+
+            <form class="auth-form" onsubmit="event.preventDefault(); sendAdminReply();" style="margin-bottom: 2rem;">
+                <textarea id="admin-msg-input" rows="2" placeholder="Type reply to student..."></textarea>
+                <button type="submit" class="btn" style="margin-top: 0.5rem;">Send Reply</button>
+            </form>
+
+            <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #e5e7eb;">
+
+            <h3>Reset Student Progress Data</h3>
+            <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.5rem;">Clears all user progress, stage unlocks, and cumulative scores across all accounts.</p>
+            <button class="btn btn-danger" onclick="resetAllData()">Reset All User Data</button>
+
+            <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #e5e7eb;">
+
+            <h3>Add New Question</h3>
+            <form class="auth-form" onsubmit="event.preventDefault(); addQuestion();">
+                <label>Stage (1 - 40):</label>
+                <input type="number" id="q-stage" min="1" max="40" value="1">
+                
+                <label>Question Text:</label>
+                <input type="text" id="q-text" required placeholder="Enter question">
+
+                <label>Option A:</label>
+                <input type="text" id="q-opt-a" required>
+                <label>Option B:</label>
+                <input type="text" id="q-opt-b" required>
+                <label>Option C:</label>
+                <input type="text" id="q-opt-c" required>
+                <label>Option D:</label>
+                <input type="text" id="q-opt-d" required>
+
+                <label>Correct Answer:</label>
+                <select id="q-ans">
+                    <option value="A">Option A</option>
+                    <option value="B">Option B</option>
+                    <option value="C">Option C</option>
+                    <option value="D">Option D</option>
+                </select>
+
+                <button type="submit" class="btn" style="margin-top: 1rem;">Add Question</button>
+            </form>
+        </div>
+
+    </div>
+
+    <footer>
+        &copy; 2026 Rasmedian Network Educational Resource Centre. All Rights Reserved.
+    </footer>
+
+    <script>
+        // --- APP CONFIGURATION & TROPHY LOGIC ---
+        const config = {
+            totalStages: 40,
+            questionsPerStage: 5,
+            pointsPerQuestion: 10,
+            timePerQuestion: 30, // 30 seconds timer per question
+            maxScore: 2000,
+            trophyThresholds: [
+                { minScore: 1900, maxScore: 2000, trophy: "Diamond Cup", icon: "💎" },
+                { minScore: 1800, maxScore: 1899, trophy: "Gold Cup", icon: "🏆" },
+                { minScore: 1700, maxScore: 1799, trophy: "Silver Cup", icon: "🥈" },
+                { minScore: 1600, maxScore: 1699, trophy: "Bronze Cup", icon: "🥉" },
+                { minScore: 1500, maxScore: 1599, trophy: "Brass Cup", icon: "🥇" },
+                { minScore: 1400, maxScore: 1499, trophy: "Iron Cup", icon: "⚔️" },
+                { minScore: 1300, maxScore: 1399, trophy: "Glass Cup", icon: "🥛" },
+                { minScore: 1000, maxScore: 1299, trophy: "Plastic Cup", icon: "🥤" }
+            ]
+        };
+
+        // --- UNALTERED QUESTION BANK (Stages 1 to 40) ---
+        const defaultQuestions = [
+            // Stage 1
+            { stage: 1, id: 1, question: "What is the first pillar of Islam?", options: ["Salah", "Shahadah", "Zakat", "Hajj"], answer: "B" },
+            { stage: 1, id: 2, question: "How many times a day are Muslims required to perform obligatory prayers?", options: ["3", "4", "5", "6"], answer: "C" },
+            { stage: 1, id: 3, question: "The holy book of Islam is called:", options: ["Torah", "Injil", "Zabur", "Quran"], answer: "D" },
+            { stage: 1, id: 4, question: "In which city is the Kaaba located?", options: ["Madinah", "Jerusalem", "Makkah", "Karbala"], answer: "C" },
+            { stage: 1, id: 5, question: "Who was the last Prophet in Islam?", options: ["Prophet Musa", "Prophet Isa", "Prophet Ibrahim", "Prophet Muhammad (PBUH)"], answer: "D" },
+            // Stage 2
+            { stage: 2, id: 6, question: "What is the Arabic term for charity that is one of the five pillars?", options: ["Sawm", "Zakat", "Jihad", "Sadaqah"], answer: "B" },
+            { stage: 2, id: 7, question: "During which month do Muslims fast from dawn to sunset?", options: ["Dhul Hijjah", "Muharram", "Ramadan", "Sha'ban"], answer: "C" },
+            { stage: 2, id: 8, question: "The night journey + ascension of the Prophet is known as:", options: ["Hijrah", "Isra", "Mi'raj", "Isra and Mi'raj"], answer: "D" },
+            { stage: 2, id: 9, question: "How many chapters (Surahs) are in the Quran?", options: ["99", "114", "120", "30"], answer: "B" },
+            { stage: 2, id: 10, question: "What is the direction Muslims face during prayer called?", options: ["Qiblah", "Minaret", "Mihrab", "Masjid"], answer: "A" },
+            // Stage 3
+            { stage: 3, id: 11, question: "The pilgrimage to Makkah that every Muslim must do once if able is:", options: ["Umrah", "Hajj", "Tawaf", "Eid"], answer: "B" },
+            { stage: 3, id: 12, question: "Which angel revealed the Quran to Prophet Muhammad (PBUH)?", options: ["Angel Mikail", "Angel Israfil", "Angel Jibril", "Angel Azrael"], answer: "C" },
+            { stage: 3, id: 13, question: "Eid al-Fitr marks the end of:", options: ["Hajj", "Ramadan fasting", "Muharram", "Friday prayers"], answer: "B" },
+            { stage: 3, id: 14, question: "What does \"Islam\" literally mean?", options: ["Peace", "Submission", "Prayer", "Belief"], answer: "B" },
+            { stage: 3, id: 15, question: "The first mosque built by Prophet Muhammad (PBUH) in Madinah was:", options: ["Al-Aqsa Mosque", "Masjid al-Haram", "Masjid Quba", "Masjid an-Nabawi"], answer: "C" },
+            // Stage 4
+            { stage: 4, id: 16, question: "Which of these is NOT one of the six articles of faith?", options: ["Belief in Angels", "Belief in Books", "Belief in Jannah only", "Belief in the Day of Judgment"], answer: "C" },
+            { stage: 4, id: 17, question: "The migration of Prophet Muhammad (PBUH) from Makkah to Madinah is called:", options: ["Isra", "Hijrah", "Hajj", "Dawah"], answer: "B" },
+            { stage: 4, id: 18, question: "How many pillars of Islam are there?", options: ["3", "4", "5", "6"], answer: "C" },
+            { stage: 4, id: 19, question: "What is the name of the charitable giving given voluntarily besides Zakat?", options: ["Fitrah", "Sadaqah", "Khums", "Kaffarah"], answer: "B" },
+            { stage: 4, id: 20, question: "Which Surah is known as \"The Heart of the Quran\"?", options: ["Surah Al-Fatiha", "Surah Al-Ikhlas", "Surah Yasin", "Surah Al-Baqarah"], answer: "C" },
+            // Stage 5
+            { stage: 5, id: 21, question: "Which Prophet built the Kaaba with his son Ismail?", options: ["Prophet Nuh", "Prophet Ibrahim", "Prophet Yaqub", "Prophet Yusuf"], answer: "B" },
+            { stage: 5, id: 22, question: "What is the term for ritual purification before prayer?", options: ["Ghusl", "Wudu", "Tayammum", "Tahajjud"], answer: "B" },
+            { stage: 5, id: 23, question: "The battle where Muslims first fought in defense of Islam was:", options: ["Battle of Uhud", "Battle of Badr", "Battle of Khandaq", "Battle of Khaybar"], answer: "B" },
+            { stage: 5, id: 24, question: "How many times is \"Bismillah\" repeated in the Quran as a verse?", options: ["112", "113", "114", "115"], answer: "C" },
+            { stage: 5, id: 25, question: "Which Caliph compiled the Quran into one book?", options: ["Abu Bakr", "Umar", "Uthman", "Ali"], answer: "C" },
+            // Stage 6
+            { stage: 6, id: 26, question: "What is the adhan?", options: ["The call to prayer", "The Friday sermon", "The prayer itself", "The closing of prayer"], answer: "A" },
+            { stage: 6, id: 27, question: "The night of power, better than 1000 months, is called:", options: ["Laylatul Bara'ah", "Laylatul Isra", "Laylatul Qadr", "Laylatul Mi'raj"], answer: "C" },
+            { stage: 6, id: 28, question: "Which Prophet was swallowed by a big fish?", options: ["Prophet Yunus", "Prophet Ayyub", "Prophet Sulaiman", "Prophet Dawud"], answer: "A" },
+            { stage: 6, id: 29, question: "Zakat al-Fitr is given:", options: ["During Hajj", "Before Eid al-Fitr prayer", "During Ramadan nights", "On Fridays"], answer: "B" },
+            { stage: 6, id: 30, question: "The first woman to accept Islam was:", options: ["Aisha", "Khadijah", "Fatimah", "Hafsa"], answer: "B" },
+            // Stage 7
+            { stage: 7, id: 31, question: "How many Rak'ahs are in Fajr prayer?", options: ["2", "3", "4", "5"], answer: "A" },
+            { stage: 7, id: 32, question: "What is the name of the tree that Prophet Adam was forbidden to eat from?", options: ["Fig tree", "Olive tree", "Forbidden tree", "Date palm"], answer: "C" },
+            { stage: 7, id: 33, question: "Which city is the third holiest site in Islam?", options: ["Makkah", "Madinah", "Jerusalem", "Taif"], answer: "C" },
+            { stage: 7, id: 34, question: "The word \"Sunnah\" refers to:", options: ["The Quran", "Sayings and actions of the Prophet", "Islamic law", "Prayer times"], answer: "B" },
+            { stage: 7, id: 35, question: "Which month comes after Ramadan?", options: ["Sha'ban", "Shawwal", "Dhul Qadah", "Muharram"], answer: "B" },
+            // Stage 8
+            { stage: 8, id: 36, question: "What is Ghusl?", options: ["Minor ablution", "Full body purification", "Dry purification", "Prayer for the dead"], answer: "B" },
+            { stage: 8, id: 37, question: "Who was known as \"As-Siddiq\"?", options: ["Umar", "Abu Bakr", "Uthman", "Ali"], answer: "B" },
+            { stage: 8, id: 38, question: "The five daily prayers were made obligatory during:", options: ["Hijrah", "Battle of Badr", "Isra and Mi'raj", "Treaty of Hudaybiyah"], answer: "C" },
+            { stage: 8, id: 39, question: "Which Surah is recited in every Rak'ah of prayer?", options: ["Surah Al-Ikhlas", "Surah Al-Falaq", "Surah An-Nas", "Surah Al-Fatiha"], answer: "D" },
+            { stage: 8, id: 40, question: "What is the meaning of \"Tawheed\"?", options: ["Prayer", "Fasting", "Oneness of Allah", "Charity"], answer: "C" },
+            // Stage 9
+            { stage: 9, id: 41, question: "The second holiest mosque is:", options: ["Masjid al-Aqsa", "Masjid an-Nabawi", "Masjid Quba", "Masjid al-Haram"], answer: "B" },
+            { stage: 9, id: 42, question: "How many wives did Prophet Muhammad (PBUH) have?", options: ["9", "11", "12", "13"], answer: "B" },
+            { stage: 9, id: 43, question: "Which Prophet could speak to animals and control the wind?", options: ["Prophet Musa", "Prophet Sulaiman", "Prophet Isa", "Prophet Ibrahim"], answer: "B" },
+            { stage: 9, id: 44, question: "The Islamic lunar calendar starts with the month of:", options: ["Ramadan", "Dhul Hijjah", "Muharram", "Rajab"], answer: "C" },
+            { stage: 9, id: 45, question: "What do we call the circumambulation around the Kaaba?", options: ["Sa'i", "Tawaf", "Rami", "Wuquf"], answer: "B" },
+            // Stage 10
+            { stage: 10, id: 46, question: "Which Surah is also called \"Al-Shifa\"?", options: ["Surah Yasin", "Surah Al-Fatiha", "Surah Ar-Rahman", "Surah Al-Mulk"], answer: "B" },
+            { stage: 10, id: 47, question: "The first martyr in Islam was:", options: ["Hamzah", "Sumayyah", "Bilal", "Ammar"], answer: "B" },
+            { stage: 10, id: 48, question: "What is the minimum amount of wealth for Zakat to be obligatory called?", options: ["Nisab", "Khums", "Ushr", "Fitrah"], answer: "A" },
+            { stage: 10, id: 49, question: "Which Prophet received the Zabur?", options: ["Prophet Musa", "Prophet Isa", "Prophet Dawud", "Prophet Ibrahim"], answer: "C" },
+            { stage: 10, id: 50, question: "The day of Arafah is on the 9th of:", options: ["Ramadan", "Muharram", "Dhul Qadah", "Dhul Hijjah"], answer: "D" },
+            // Stage 11
+            { stage: 11, id: 51, question: "Which Surah is called \"The Opening\"?", options: ["Surah Al-Baqarah", "Surah Al-Ikhlas", "Surah Al-Fatiha", "Surah An-Nas"], answer: "C" },
+            { stage: 11, id: 52, question: "How many days is Eid al-Adha celebrated?", options: ["1", "2", "3", "4"], answer: "D" },
+            { stage: 11, id: 53, question: "Who was the first Caliph of Islam?", options: ["Umar ibn Khattab", "Abu Bakr", "Uthman", "Ali"], answer: "B" },
+            { stage: 11, id: 54, question: "What is the term for running between Safa and Marwah during Hajj/Umrah?", options: ["Tawaf", "Sa'i", "Rami", "Wuquf"], answer: "B" },
+            { stage: 11, id: 55, question: "Which Prophet was given the ability to speak to birds?", options: ["Prophet Musa", "Prophet Sulaiman", "Prophet Isa", "Prophet Nuh"], answer: "B" },
+            // Stage 12
+            { stage: 12, id: 56, question: "The month of fasting in Islam is:", options: ["Shawwal", "Ramadan", "Dhul Hijjah", "Muharram"], answer: "B" },
+            { stage: 12, id: 57, question: "What is the name of the well in Makkah with blessed water?", options: ["Zamzam", "Kawthar", "Salsabil", "Tasnim"], answer: "A" },
+            { stage: 12, id: 58, question: "How many pillars of Iman (Faith) are there?", options: ["5", "6", "7", "8"], answer: "B" },
+            { stage: 12, id: 59, question: "Which battle was fought in the month of Ramadan?", options: ["Battle of Uhud", "Battle of Badr", "Battle of Khandaq", "Battle of Hunayn"], answer: "B" },
+            { stage: 12, id: 60, question: "What is the Arabic word for \"peace\"?", options: ["Salam", "Barakah", "Rahmah", "Noor"], answer: "A" },
+            // Stage 13
+            { stage: 13, id: 61, question: "Who is known as \"Khalilullah\", the friend of Allah?", options: ["Prophet Musa", "Prophet Ibrahim", "Prophet Muhammad", "Prophet Isa"], answer: "B" },
+            { stage: 13, id: 62, question: "The last Surah in the Quran is:", options: ["Surah Al-Ikhlas", "Surah Al-Falaq", "Surah An-Nas", "Surah Al-Asr"], answer: "C" },
+            { stage: 13, id: 63, question: "What do we call the washing of a deceased Muslim?", options: ["Wudu", "Ghusl", "Tayammum", "Janazah"], answer: "B" },
+            { stage: 13, id: 64, question: "Which mosque is located in Jerusalem?", options: ["Masjid Quba", "Masjid an-Nabawi", "Masjid al-Aqsa", "Masjid al-Haram"], answer: "C" },
+            { stage: 13, id: 65, question: "The Islamic greeting is:", options: ["Shukran", "Assalamu Alaikum", "Jazakallah", "Alhamdulillah"], answer: "B" },
+            // Stage 14
+            { stage: 14, id: 66, question: "Who led the prayer in Masjid al-Aqsa during Isra and Mi'raj?", options: ["Prophet Ibrahim", "Prophet Musa", "Prophet Muhammad", "Prophet Isa"], answer: "C" },
+            { stage: 14, id: 67, question: "What is the name of the gate of Jannah for those who fast?", options: ["Bab Ar-Rayyan", "Bab As-Salah", "Bab As-Sadaqah", "Bab Al-Jihad"], answer: "A" },
+            { stage: 14, id: 68, question: "How many times is Hajj mentioned in the Quran?", options: ["1", "2", "3", "5"], answer: "A" },
+            { stage: 14, id: 69, question: "Which Surah has no \"Bismillah\" at the beginning?", options: ["Surah Al-Fatiha", "Surah At-Tawbah", "Surah Yasin", "Surah Al-Mulk"], answer: "B" },
+            { stage: 14, id: 70, question: "The Night Journey and Ascension started from which city?", options: ["Madinah", "Jerusalem", "Makkah", "Taif"], answer: "C" },
+            // Stage 15
+            { stage: 15, id: 71, question: "Who was the second Caliph of Islam?", options: ["Abu Bakr", "Umar", "Uthman", "Ali"], answer: "B" },
+            { stage: 15, id: 72, question: "Which Surah is recited to seek protection from evil?", options: ["Al-Fatiha", "Al-Ikhlas", "Al-Falaq", "Al-Kawthar"], answer: "C" },
+            { stage: 15, id: 73, question: "What is the Arabic term for \"belief\"?", options: ["Iman", "Islam", "Ihsan", "Taqwa"], answer: "A" },
+            { stage: 15, id: 74, question: "Which angel is responsible for blowing the trumpet on Day of Judgment?", options: ["Jibril", "Mikail", "Israfil", "Azrael"], answer: "C" },
+            { stage: 15, id: 75, question: "The treaty of Hudaybiyah was between Muslims and:", options: ["Jews", "Quraysh", "Romans", "Persians"], answer: "B" },
+            // Stage 16
+            { stage: 16, id: 76, question: "Which Prophet received the Torah?", options: ["Prophet Isa", "Prophet Musa", "Prophet Dawud", "Prophet Ibrahim"], answer: "B" },
+            { stage: 16, id: 77, question: "What is the name of Prophet Muhammad's father?", options: ["Abu Talib", "Abdullah", "Abdul Muttalib", "Abu Sufyan"], answer: "B" },
+            { stage: 16, id: 78, question: "How many times do we go around the Kaaba during Tawaf?", options: ["3", "5", "7", "9"], answer: "C" },
+            { stage: 16, id: 79, question: "Which Surah is known as \"The Beneficent\"?", options: ["Surah Yasin", "Surah Ar-Rahman", "Surah Al-Mulk", "Surah Al-Waqiah"], answer: "B" },
+            { stage: 16, id: 80, question: "Who was the first person to give adhan?", options: ["Bilal ibn Rabah", "Abu Bakr", "Umar", "Ali"], answer: "A" },
+            // Stage 17
+            { stage: 17, id: 81, question: "The night journey took the Prophet to which mosque first?", options: ["Masjid al-Haram", "Masjid an-Nabawi", "Masjid al-Aqsa", "Masjid Quba"], answer: "C" },
+            { stage: 17, id: 82, question: "What is the Arabic word for \"thank you\"?", options: ["Salam", "Shukran", "Barakallah", "Ma'assalam"], answer: "B" },
+            { stage: 17, id: 83, question: "Which Prophet was thrown into the fire by Nimrod?", options: ["Prophet Nuh", "Prophet Ibrahim", "Prophet Lut", "Prophet Yaqub"], answer: "B" },
+            { stage: 17, id: 84, question: "How many wives of the Prophet are called \"Mothers of the Believers\"?", options: ["9", "11", "12", "13"], answer: "B" },
+            { stage: 17, id: 85, question: "Which Surah is for seeking forgiveness?", options: ["Surah Al-Asr", "Surah Al-Nasr", "Surah Al-Ikhlas", "Surah Al-Kawthar"], answer: "B" },
+            // Stage 18
+            { stage: 18, id: 86, question: "What is the name of the animal that carried the Prophet during Isra?", options: ["Buraq", "Qaswa", "Yammama", "Nahla"], answer: "A" },
+            { stage: 18, id: 87, question: "Who compiled the first dictionary of Arabic?", options: ["Imam Malik", "Al-Khalil ibn Ahmad", "Imam Shafi'i", "Imam Ahmad"], answer: "B" },
+            { stage: 18, id: 88, question: "The prayer performed after sunset is:", options: ["Fajr", "Dhuhr", "Asr", "Maghrib"], answer: "D" },
+            { stage: 18, id: 89, question: "Which city did Prophet Yunus preach to?", options: ["Makkah", "Nineveh", "Jerusalem", "Madinah"], answer: "B" },
+            { stage: 18, id: 90, question: "What does \"Alhamdulillah\" mean?", options: ["Allah is Great", "Praise be to Allah", "Allah is One", "Allah Forgives"], answer: "B" },
+            // Stage 19
+            { stage: 19, id: 91, question: "Who was the scribe of the Prophet?", options: ["Zaid ibn Thabit", "Umar ibn Khattab", "Uthman ibn Affan", "Ali ibn Abi Talib"], answer: "A" },
+            { stage: 19, id: 92, question: "The Friday congregational prayer is called:", options: ["Salat ul Eid", "Salat ul Janazah", "Salat ul Jumu'ah", "Salat ul Taraweeh"], answer: "C" },
+            { stage: 19, id: 93, question: "Which Prophet was given the ability to heal the sick?", options: ["Prophet Musa", "Prophet Isa", "Prophet Ibrahim", "Prophet Sulaiman"], answer: "B" },
+            { stage: 19, id: 94, question: "What is the name of the angel of death?", options: ["Jibril", "Mikail", "Israfil", "Azrael"], answer: "D" },
+            { stage: 19, id: 95, question: "The month after Shawwal is:", options: ["Dhul Qadah", "Dhul Hijjah", "Muharram", "Safar"], answer: "A" },
+            // Stage 20
+            { stage: 20, id: 96, question: "Who was known as \"Saifullah\", the Sword of Allah?", options: ["Khalid ibn Walid", "Hamzah", "Ali", "Umar"], answer: "A" },
+            { stage: 20, id: 97, question: "Which Surah describes the story of the People of the Cave?", options: ["Surah Yasin", "Surah Al-Kahf", "Surah Maryam", "Surah Taha"], answer: "B" },
+            { stage: 20, id: 98, question: "What is the Arabic term for \"patience\"?", options: ["Shukr", "Sabr", "Tawakkul", "Ihsan"], answer: "B" },
+            { stage: 20, id: 99, question: "The first revelation came to the Prophet in which cave?", options: ["Cave Thawr", "Cave Hira", "Cave of Ashab al-Kahf", "Cave of Jabal"], answer: "B" },
+            { stage: 20, id: 100, question: "How many times is \"Allah\" mentioned in the Quran approximately?", options: ["1000", "2500", "2698", "5000"], answer: "C" },
+            // Stage 21
+            { stage: 21, id: 101, question: "What is the name of the Prophet's camel?", options: ["Buraq", "Qaswa", "Nahla", "Adhwa"], answer: "B" },
+            { stage: 21, id: 102, question: "Which Prophet built the Ark?", options: ["Prophet Ibrahim", "Prophet Nuh", "Prophet Hud", "Prophet Salih"], answer: "B" },
+            { stage: 21, id: 103, question: "The prayer before sunrise is:", options: ["Fajr", "Dhuhr", "Asr", "Isha"], answer: "A" },
+            { stage: 21, id: 104, question: "Who was the first martyr among men in Islam?", options: ["Hamzah", "Harith ibn Abi Halah", "Ammar", "Bilal"], answer: "B" },
+            { stage: 21, id: 105, question: "What does \"Allahu Akbar\" mean?", options: ["Praise be to Allah", "Allah is One", "Allah is the Greatest", "Allah is Merciful"], answer: "C" },
+            // Stage 22
+            { stage: 22, id: 106, question: "Which Surah has 286 verses, the longest in Quran?", options: ["Surah Al-Imran", "Surah Al-Baqarah", "Surah An-Nisa", "Surah Al-Maidah"], answer: "B" },
+            { stage: 22, id: 107, question: "Who was the Prophet's uncle who protected him?", options: ["Abu Lahab", "Abu Talib", "Abbas", "Hamzah"], answer: "B" },
+            { stage: 22, id: 108, question: "The charity given at the end of Ramadan is called:", options: ["Zakat", "Sadaqah", "Zakat al-Fitr", "Khums"], answer: "C" },
+            { stage: 22, id: 109, question: "Which Prophet was swallowed by a whale?", options: ["Prophet Yunus", "Prophet Ayyub", "Prophet Shu'aib", "Prophet Zakariya"], answer: "A" },
+            { stage: 22, id: 110, question: "How many times is Prophet Muhammad's name mentioned in the Quran?", options: ["2", "3", "4", "5"], answer: "C" },
+            // Stage 23
+            { stage: 23, id: 111, question: "What is the name of the first revelation?", options: ["Surah Al-Ikhlas", "Surah Al-Fatiha", "First 5 verses of Surah Al-Alaq", "Surah An-Nas"], answer: "C" },
+            { stage: 23, id: 112, question: "Who led the first Hijrah to Abyssinia?", options: ["Umar", "Uthman", "Ja'far ibn Abi Talib", "Ali"], answer: "C" },
+            { stage: 23, id: 113, question: "The prayer of 4 Rak'ahs in the afternoon is:", options: ["Fajr", "Dhuhr", "Asr", "Maghrib"], answer: "B" },
+            { stage: 23, id: 114, question: "Which Prophet could understand the language of ants?", options: ["Prophet Musa", "Prophet Sulaiman", "Prophet Dawud", "Prophet Ibrahim"], answer: "B" },
+            { stage: 23, id: 115, question: "What is the name of the pond in Jannah?", options: ["Kawthar", "Tasnim", "Salsabil", "Ma'een"], answer: "A" },
+            // Stage 24
+            { stage: 24, id: 116, question: "Who was the first female Hafiz of the Quran?", options: ["Aisha", "Hafsa", "Umm Salama", "Khadijah"], answer: "B" },
+            { stage: 24, id: 117, question: "The 2 Rak'ahs before Fajr are called:", options: ["Sunnah Mu'akkadah", "Witr", "Taraweeh", "Duha"], answer: "A" },
+            { stage: 24, id: 118, question: "Which city is called \"The City of the Prophet\"?", options: ["Makkah", "Jerusalem", "Madinah", "Taif"], answer: "C" },
+            { stage: 24, id: 119, question: "Who was thrown into a well by his brothers?", options: ["Prophet Ibrahim", "Prophet Yusuf", "Prophet Yaqub", "Prophet Musa"], answer: "B" },
+            { stage: 24, id: 120, question: "What is the Arabic term for \"charity\"?", options: ["Sawm", "Salah", "Sadaqah", "Hajj"], answer: "C" },
+            // Stage 25
+            { stage: 25, id: 121, question: "Which battle took place at Mount Uhud?", options: ["Battle of Badr", "Battle of Uhud", "Battle of Khandaq", "Battle of Tabuk"], answer: "B" },
+            { stage: 25, id: 122, question: "Who was the first to embrace Islam among children?", options: ["Zaid", "Ali", "Talha", "Zubair"], answer: "B" },
+            { stage: 25, id: 123, question: "The night of forgiveness in Sha'ban is called:", options: ["Laylatul Qadr", "Laylatul Bara'ah", "Laylatul Isra", "Laylatul Eid"], answer: "B" },
+            { stage: 25, id: 124, question: "Which Surah is recited for protection at night?", options: ["Surah Al-Baqarah", "Surah Al-Mulk", "Surah Ar-Rahman", "Surah Yasin"], answer: "B" },
+            { stage: 25, id: 125, question: "Who was the Prophet's wet nurse?", options: ["Halima As-Sa'diyah", "Umm Ayman", "Barakah", "Sumayyah"], answer: "A" },
+            // Stage 26
+            { stage: 26, id: 126, question: "What does \"InshaAllah\" mean?", options: ["Praise be to Allah", "If Allah wills", "Allah is sufficient", "Allah is Great"], answer: "B" },
+            { stage: 26, id: 127, question: "Which Prophet's people were destroyed by a mighty wind?", options: ["Prophet Hud", "Prophet Salih", "Prophet Lut", "Prophet Shu'aib"], answer: "A" },
+            { stage: 26, id: 128, question: "How many Rak'ahs are in Maghrib prayer?", options: ["2", "3", "4", "5"], answer: "B" },
+            { stage: 26, id: 129, question: "Who was known as \"Dhul-Nurayn\", possessor of two lights?", options: ["Abu Bakr", "Umar", "Uthman", "Ali"], answer: "C" },
+            { stage: 26, id: 130, question: "The stone kissed during Tawaf is called:", options: ["Maqam Ibrahim", "Hajar Aswad", "Rukn Yamani", "Multazam"], answer: "B" },
+            // Stage 27
+            { stage: 27, id: 131, question: "Which Surah is called \"The Cow\"?", options: ["Surah Al-Imran", "Surah Al-Baqarah", "Surah An-Nahl", "Surah Al-An'am"], answer: "B" },
+            { stage: 27, id: 132, question: "Who was the first to call adhan in Madinah?", options: ["Bilal", "Abdullah ibn Zaid", "Sa'd ibn Abi Waqqas", "Abu Mahdhurah"], answer: "A" },
+            { stage: 27, id: 133, question: "What is the Arabic term for \"gratitude\"?", options: ["Sabr", "Shukr", "Taqwa", "Ihsan"], answer: "B" },
+            { stage: 27, id: 134, question: "Which Prophet was given a kingdom and spoke to jinn?", options: ["Prophet Ibrahim", "Prophet Musa", "Prophet Sulaiman", "Prophet Dawud"], answer: "C" },
+            { stage: 27, id: 135, question: "The prayer performed at night voluntarily is:", options: ["Witr", "Tahajjud", "Duha", "Taraweeh"], answer: "B" },
+            // Stage 28
+            { stage: 28, id: 136, question: "Who was the Prophet's daughter married to Ali?", options: ["Zainab", "Ruqayyah", "Umm Kulthum", "Fatimah"], answer: "D" },
+            { stage: 28, id: 137, question: "Which Surah starts with \"Alif Lam Mim\"?", options: ["Surah Al-Fatiha", "Surah Al-Baqarah", "Surah Al-Ikhlas", "Surah An-Nas"], answer: "B" },
+            { stage: 28, id: 138, question: "What is the name of the first mosque in Islam?", options: ["Masjid al-Haram", "Masjid an-Nabawi", "Masjid Quba", "Masjid al-Aqsa"], answer: "C" },
+            { stage: 28, id: 139, question: "Who was the Prophet's companion in the Cave Thawr?", options: ["Umar", "Abu Bakr", "Ali", "Uthman"], answer: "B" },
+            { stage: 28, id: 140, question: "The 10 days of Dhul Hijjah are best for:", options: ["Fasting", "Good deeds", "Hajj", "All of the above"], answer: "D" },
+            // Stage 29
+            { stage: 29, id: 141, question: "Which Prophet was raised to the heavens alive?", options: ["Prophet Ibrahim", "Prophet Isa", "Prophet Musa", "Prophet Nuh"], answer: "B" },
+            { stage: 29, id: 142, question: "What does \"Bismillah\" mean?", options: ["In the name of Allah", "Allah is Great", "Praise be to Allah", "There is no god but Allah"], answer: "A" },
+            { stage: 29, id: 143, question: "Who was the first to be circumcised?", options: ["Prophet Adam", "Prophet Ibrahim", "Prophet Ismail", "Prophet Muhammad"], answer: "B" },
+            { stage: 29, id: 144, question: "The prayer of 4 Rak'ahs before Asr is:", options: ["Fard", "Sunnah", "Nafl", "Wajib"], answer: "C" },
+            { stage: 29, id: 145, question: "Which Surah is for protection from magic?", options: ["Surah Al-Baqarah", "Surah Al-Falaq", "Surah An-Nas", "Both B and C"], answer: "D" },
+            // Stage 30
+            { stage: 30, id: 146, question: "Who was the Prophet's first wife?", options: ["Aisha", "Hafsa", "Khadijah", "Sawda"], answer: "C" },
+            { stage: 30, id: 147, question: "What is the name of the bridge over Hell?", options: ["Sirat", "Mizaan", "Kawthar", "Haud"], answer: "A" },
+            { stage: 30, id: 148, question: "Which Prophet was tested with illness for many years?", options: ["Prophet Yusuf", "Prophet Ayyub", "Prophet Yaqub", "Prophet Nuh"], answer: "B" },
+            { stage: 30, id: 149, question: "The 3 white days of fasting each month are:", options: ["10,11,12", "13,14,15", "20,21,22", "25,26,27"], answer: "B" },
+            { stage: 30, id: 150, question: "Who will be the first to enter Jannah?", options: ["Abu Bakr", "Umar", "Prophet Muhammad", "Bilal"], answer: "C" },
+            // Stage 31
+            { stage: 31, id: 151, question: "What is the name of the angel who records good deeds?", options: ["Raqeeb", "Aateed", "Kiraman Katibeen", "Munkar"], answer: "C" },
+            { stage: 31, id: 152, question: "Which Prophet was given the ability to make birds from clay?", options: ["Prophet Musa", "Prophet Isa", "Prophet Ibrahim", "Prophet Sulaiman"], answer: "B" },
+            { stage: 31, id: 153, question: "The prayer of 3 Rak'ahs at night is called:", options: ["Fajr", "Witr", "Duha", "Ishraq"], answer: "B" },
+            { stage: 31, id: 154, question: "Who was the first to donate his wealth for the Battle of Tabuk?", options: ["Abu Bakr", "Umar", "Uthman", "Abdur Rahman ibn Awf"], answer: "C" },
+            { stage: 31, id: 155, question: "What does \"Jazakallahu Khairan\" mean?", options: ["May Allah bless you", "May Allah reward you with good", "Peace be upon you", "Thank you"], answer: "B" },
+            // Stage 32
+            { stage: 32, id: 156, question: "Which Surah is known as \"The Victory\"?", options: ["Surah Al-Fath", "Surah An-Nasr", "Surah Al-Anfal", "Surah Muhammad"], answer: "A" },
+            { stage: 32, id: 157, question: "Who was the Prophet's grandfather?", options: ["Abdullah", "Abu Talib", "Abdul Muttalib", "Hashim"], answer: "C" },
+            { stage: 32, id: 158, question: "The fasting of 6 days in Shawwal is:", options: ["Fard", "Sunnah", "Wajib", "Haram"], answer: "B" },
+            { stage: 32, id: 159, question: "Which Prophet was given wisdom and judgment as a child?", options: ["Prophet Yahya", "Prophet Isa", "Prophet Yusuf", "Prophet Dawud"], answer: "A" },
+            { stage: 32, id: 160, question: "What is the name of the market in Jannah?", options: ["Suq al-Jannah", "Dar as-Salam", "Jannat al-Firdaws", "No market, only gardens"], answer: "A" },
+            // Stage 33
+            { stage: 33, id: 161, question: "Who was known as \"Al-Farooq\", the one who distinguishes truth from falsehood?", options: ["Abu Bakr", "Umar", "Uthman", "Ali"], answer: "B" },
+            { stage: 33, id: 162, question: "The prayer for rain is called:", options: ["Salat ul Istisqa", "Salat ul Istikhara", "Salat ul Tasbeeh", "Salat ul Hajat"], answer: "A" },
+            { stage: 33, id: 163, question: "Which Prophet was commanded to sacrifice his son?", options: ["Prophet Nuh", "Prophet Ibrahim", "Prophet Yaqub", "Prophet Ismail"], answer: "B" },
+            { stage: 33, id: 164, question: "What is the Arabic term for \"trust in Allah\"?", options: ["Sabr", "Shukr", "Tawakkul", "Ihsan"], answer: "C" },
+            { stage: 33, id: 165, question: "Who was the first to write down the Quran?", options: ["Zaid ibn Thabit", "Abu Bakr", "Uthman", "Ali"], answer: "A" },
+            // Stage 34
+            { stage: 34, id: 166, question: "The night prayer in Ramadan is called:", options: ["Tahajjud", "Witr", "Taraweeh", "Duha"], answer: "C" },
+            { stage: 34, id: 167, question: "Which Prophet's wife was called \"Pharaoh's believing woman\"?", options: ["Wife of Lut", "Wife of Nuh", "Asiya", "Hajar"], answer: "C" },
+            { stage: 34, id: 168, question: "What does \"SubhanAllah\" mean?", options: ["Praise be to Allah", "Allah is the Greatest", "Glory be to Allah", "Allah is One"], answer: "C" },
+            { stage: 34, id: 169, question: "Who was the first to enter Islam among women?", options: ["Aisha", "Khadijah", "Fatimah", "Hafsa"], answer: "B" },
+            { stage: 34, id: 170, question: "The 4 sacred months in Islam include:", options: ["Ramadan", "Muharram", "Rajab", "Both B and C"], answer: "D" },
+            // Stage 35
+            { stage: 35, id: 171, question: "Which Surah is recited to remove anxiety?", options: ["Surah Al-Inshirah", "Surah Ad-Duha", "Surah Ash-Sharh", "Both A and C"], answer: "D" },
+            { stage: 35, id: 172, question: "Who was the Prophet's adopted son?", options: ["Zaid ibn Harithah", "Ali", "Ja'far", "Hamzah"], answer: "A" },
+            { stage: 35, id: 173, question: "What is the name of the tree in Jannah?", options: ["Tuba", "Sidratul Muntaha", "Zaqqum", "Both A and B"], answer: "D" },
+            { stage: 35, id: 174, question: "The sacrifice during Eid al-Adha commemorates:", options: ["Prophet Nuh", "Prophet Ibrahim", "Prophet Ismail", "Prophet Musa"], answer: "B" },
+            { stage: 35, id: 175, question: "Who was known as \"Sayyid ush-Shuhada\", Master of Martyrs?", options: ["Bilal", "Hamzah", "Ali", "Umar"], answer: "B" },
+            // Stage 36
+            { stage: 36, id: 176, question: "What is the Arabic term for \"excellence in worship\"?", options: ["Iman", "Islam", "Ihsan", "Taqwa"], answer: "C" },
+            { stage: 36, id: 177, question: "Which Prophet's dua was \"My Lord, increase me in knowledge\"?", options: ["Prophet Musa", "Prophet Muhammad", "Prophet Ibrahim", "Prophet Sulaiman"], answer: "B" },
+            { stage: 36, id: 178, question: "The prayer between Maghrib and Isha with many Rak'ahs is:", options: ["Awwabeen", "Ishraq", "Duha", "Tahajjud"], answer: "A" },
+            { stage: 36, id: 179, question: "Who was the first to migrate to Madinah?", options: ["Abu Salama", "Mus'ab ibn Umair", "Umar", "Ali"], answer: "B" },
+            { stage: 36, id: 180, question: "What does \"La ilaha illallah\" mean?", options: ["Allah is One", "There is no god but Allah", "Allah is Great", "Praise be to Allah"], answer: "B" },
+            // Stage 37
+            { stage: 37, id: 181, question: "Which Surah talks about the elephant army?", options: ["Surah Quraysh", "Surah Al-Fil", "Surah Al-Humazah", "Surah Al-Asr"], answer: "B" },
+            { stage: 37, id: 182, question: "Who was the Prophet's barber?", options: ["Bilal", "Ammar", "Abu Rafi", "Khabbab"], answer: "C" },
+            { stage: 37, id: 183, question: "The 2 Eid prayers have how many Takbirs in first Rak'ah?", options: ["3", "5", "7", "9"], answer: "C" },
+            { stage: 37, id: 184, question: "What is the name of Hell's gate for those who fast?", options: ["Bab Ar-Rayyan", "Bab As-Salah", "Bab As-Sadaqah", "Bab Al-Jihad"], answer: "A" },
+            { stage: 37, id: 185, question: "Who was the Prophet's muezzin in Madinah?", options: ["Bilal", "Abdullah ibn Umm Maktum", "Sa'd", "Both A and B"], answer: "D" },
+            // Stage 38
+            { stage: 38, id: 186, question: "Which Prophet was given the miracle of splitting the sea?", options: ["Prophet Ibrahim", "Prophet Musa", "Prophet Isa", "Prophet Nuh"], answer: "B" },
+            { stage: 38, id: 187, question: "What does \"Astaghfirullah\" mean?", options: ["Praise be to Allah", "I seek forgiveness from Allah", "Allah is sufficient", "Allah is Great"], answer: "B" },
+            { stage: 38, id: 188, question: "Who was the first to be buried in Baqi cemetery?", options: ["Uthman ibn Maz'un", "Hamzah", "Abu Bakr", "Umar"], answer: "A" },
+            { stage: 38, id: 189, question: "The prayer for seeking guidance is:", options: ["Salat ul Hajat", "Salat ul Istikhara", "Salat ul Tasbeeh", "Salat ul Khusuf"], answer: "B" },
+            { stage: 38, id: 190, question: "Which Prophet was given the ability to speak in the cradle?", options: ["Prophet Yahya", "Prophet Isa", "Prophet Yusuf", "Prophet Musa"], answer: "B" },
+            // Stage 39
+            { stage: 39, id: 191, question: "What is the name of the angel of mountains?", options: ["Israfil", "Malik", "The Angel of Mountains", "Ridwan"], answer: "C" },
+            { stage: 39, id: 192, question: "Who was the Prophet's uncle who became Muslim late?", options: ["Abu Lahab", "Abu Talib", "Abbas", "Hamzah"], answer: "C" },
+            { stage: 39, id: 193, question: "The charity of 1/40th of wealth is:", options: ["Sadaqah", "Zakat", "Khums", "Ushr"], answer: "B" },
+            { stage: 39, id: 194, question: "Which Surah is called \"The Sincere\"?", options: ["Surah Al-Fatiha", "Surah Al-Ikhlas", "Surah Al-Kafirun", "Surah Al-Ma'un"], answer: "B" },
+            { stage: 39, id: 195, question: "Who was the first to give the call for prayer in a loud voice?", options: ["Bilal", "Abu Mahdhurah", "Abdullah ibn Zaid", "Sa'd"], answer: "A" },
+            // Stage 40
+            { stage: 40, id: 196, question: "What does \"Taqwa\" mean?", options: ["Patience", "God-consciousness", "Charity", "Gratitude"], answer: "B" },
+            { stage: 40, id: 197, question: "Which Prophet was given the ability to understand animals?", options: ["Prophet Musa", "Prophet Dawud", "Prophet Sulaiman", "Prophet Ibrahim"], answer: "C" },
+            { stage: 40, id: 198, question: "The 2 Rak'ahs after sunrise are called:", options: ["Duha", "Ishraq", "Awwabeen", "Tahajjud"], answer: "B" },
+            { stage: 40, id: 199, question: "Who was the Prophet's last wife?", options: ["Aisha", "Hafsa", "Maimunah", "Juwayriyah"], answer: "C" },
+            { stage: 40, id: 200, question: "What will be the last thing to be taken from people?", options: ["Wealth", "Knowledge", "Amanah - Trust", "Faith"], answer: "C" }
+        ];
+
+        // --- APP STATE ---
+        let questions = JSON.parse(localStorage.getItem('islamic_quiz_questions')) || defaultQuestions;
+        let studentsDb = JSON.parse(localStorage.getItem('islamic_quiz_students_db')) || {};
+        let messagesDb = JSON.parse(localStorage.getItem('islamic_quiz_messages_db')) || {}; // { username: [{ sender: 'student'|'admin', text: '', time: '' }] }
+        let loggedInStudent = localStorage.getItem('islamic_quiz_current_student') || null;
+
+        let currentStage = 1;
+        let currentQuestionIndex = 0;
+        let currentStageQuestions = [];
+        let currentStageScore = 0;
+        let selectedOption = null;
+        let questionTimer = null;
+        let timeLeft = config.timePerQuestion;
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            if (loggedInStudent && studentsDb[loggedInStudent]) {
+                initAppForStudent(loggedInStudent);
+            } else {
+                showAuthScreen();
+            }
+        };
+
+        // --- AUTHENTICATION & REGISTRATION ---
+        function switchAuthTab(tab) {
+            if (tab === 'login') {
+                document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('register-form').classList.add('hidden');
+                document.getElementById('tab-login').style.borderBottom = '3px solid var(--emerald-secondary)';
+                document.getElementById('tab-register').style.borderBottom = 'none';
+            } else {
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('register-form').classList.remove('hidden');
+                document.getElementById('tab-register').style.borderBottom = '3px solid var(--emerald-secondary)';
+                document.getElementById('tab-login').style.borderBottom = 'none';
+            }
+        }
+
+        function handleRegister() {
+            const firstName = document.getElementById('reg-firstname').value.trim();
+            const gender = document.getElementById('reg-gender').value;
+            const password = document.getElementById('reg-password').value;
+
+            if (!firstName || !gender || !password) {
+                alert('Please fill out all registration fields.');
+                return;
+            }
+
+            const username = firstName;
+
+            if (studentsDb[username]) {
+                alert(`The username/first name "${username}" is already registered. Please login instead.`);
+                switchAuthTab('login');
+                document.getElementById('login-username').value = username;
+                return;
+            }
+
+            // Create New Student Record
+            studentsDb[username] = {
+                firstName: firstName,
+                gender: gender,
+                password: password,
+                unlockedStage: 1,
+                stageScores: {},
+                totalScore: 0
+            };
+
+            saveStudentsDb();
+            alert(`Registration successful! Welcome, ${firstName}. You are now logged in.`);
+            
+            loginUser(username);
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            if (!studentsDb[username]) {
+                alert('Student account not found. Please register first.');
+                return;
+            }
+
+            if (studentsDb[username].password !== password) {
+                alert('Incorrect password! Please try again.');
+                return;
+            }
+
+            loginUser(username);
+        }
+
+        function loginUser(username) {
+            loggedInStudent = username;
+            localStorage.setItem('islamic_quiz_current_student', username);
+            initAppForStudent(username);
+        }
+
+        function logoutStudent() {
+            clearInterval(questionTimer);
+            loggedInStudent = null;
+            localStorage.removeItem('islamic_quiz_current_student');
+            showAuthScreen();
+        }
+
+        function showAuthScreen() {
+            document.getElementById('user-header-bar').classList.add('hidden');
+            document.getElementById('app-nav').classList.add('hidden');
+            showScreen('auth-screen');
+        }
+
+        function initAppForStudent(username) {
+            document.getElementById('user-header-bar').classList.remove('hidden');
+            document.getElementById('app-nav').classList.remove('hidden');
+
+            updateTopHeaderDisplay();
+            renderDashboard();
+            renderStages();
+            renderTrophies();
+            renderStudentMessages();
+
+            showScreen('home-screen');
+        }
+
+        function updateTopHeaderDisplay() {
+            if (!loggedInStudent || !studentsDb[loggedInStudent]) return;
+            const user = studentsDb[loggedInStudent];
+            document.getElementById('header-student-name').innerText = user.firstName;
+            document.getElementById('header-student-gender').innerText = user.gender;
+            document.getElementById('header-student-points').innerText = user.totalScore;
+            document.getElementById('home-welcome-name').innerText = user.firstName;
+        }
+
+        function saveStudentsDb() {
+            localStorage.setItem('islamic_quiz_students_db', JSON.stringify(studentsDb));
+            updateTopHeaderDisplay();
+        }
+
+        // --- NAVIGATION LOGIC ---
+        function showScreen(screenId) {
+            const screens = [
+                'auth-screen', 'home-screen', 'stages-screen', 
+                'quiz-screen', 'result-screen', 'trophies-screen', 
+                'messages-screen', 'admin-login-screen', 'admin-panel-screen'
+            ];
+            screens.forEach(s => document.getElementById(s).classList.add('hidden'));
+            
+            document.getElementById(screenId).classList.remove('hidden');
+
+            // Update Navigation State
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            if(screenId === 'home-screen') document.getElementById('nav-home').classList.add('active');
+            if(screenId === 'stages-screen') document.getElementById('nav-stages').classList.add('active');
+            if(screenId === 'trophies-screen') document.getElementById('nav-trophies').classList.add('active');
+            if(screenId === 'messages-screen') document.getElementById('nav-messages').classList.add('active');
+            if(screenId === 'admin-login-screen' || screenId === 'admin-panel-screen') document.getElementById('nav-admin').classList.add('active');
+        }
+
+        // --- DASHBOARD LOGIC ---
+        function renderDashboard() {
+            if (!loggedInStudent) return;
+            const user = studentsDb[loggedInStudent];
+            document.getElementById('dash-score').innerText = `${user.totalScore} / ${config.maxScore}`;
+            
+            let completed = Object.keys(user.stageScores).length;
+            document.getElementById('dash-stages').innerText = `${completed} / ${config.totalStages}`;
+
+            let trophy = getCurrentTrophy(user.totalScore);
+            document.getElementById('dash-trophy').innerText = trophy ? `${trophy.icon} ${trophy.trophy}` : "None";
+        }
+
+        function getCurrentTrophy(score) {
+            return config.trophyThresholds.find(t => score >= t.minScore && score <= t.maxScore) || null;
+        }
+
+        // --- STAGES LOGIC ---
+        function renderStages() {
+            if (!loggedInStudent) return;
+            const user = studentsDb[loggedInStudent];
+            const container = document.getElementById('stages-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= config.totalStages; i++) {
+                const btn = document.createElement('div');
+                btn.className = 'stage-btn';
+                
+                const isUnlocked = i <= user.unlockedStage;
+                const isCompleted = user.stageScores[i] !== undefined;
+
+                if (isCompleted) {
+                    btn.classList.add('completed');
+                } else if (isUnlocked) {
+                    btn.classList.add('unlocked');
+                }
+
+                btn.innerHTML = `<div>Stage ${i}</div><span>${isCompleted ? user.stageScores[i] + ' pts' : (isUnlocked ? 'Play' : 'Locked')}</span>`;
+
+                if (isUnlocked) {
+                    btn.onclick = () => startStage(i);
+                }
+
+                container.appendChild(btn);
+            }
+        }
+
+        function continueQuiz() {
+            if (!loggedInStudent) return;
+            startStage(studentsDb[loggedInStudent].unlockedStage);
+        }
+
+        // --- QUIZ GAME ENGINE WITH QUESTION TIMER ---
+        function startStage(stageNum) {
+            currentStage = stageNum;
+            currentStageQuestions = questions.filter(q => q.stage === stageNum);
+
+            if (currentStageQuestions.length === 0) {
+                alert("No questions found for this stage.");
+                return;
+            }
+
+            currentQuestionIndex = 0;
+            currentStageScore = 0;
+
+            showScreen('quiz-screen');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(questionTimer);
+            selectedOption = null;
+            document.getElementById('next-btn').classList.add('hidden');
+
+            const q = currentStageQuestions[currentQuestionIndex];
+            document.getElementById('quiz-stage-title').innerText = `Stage ${currentStage}`;
+            document.getElementById('quiz-progress').innerText = `Question ${currentQuestionIndex + 1} / ${config.questionsPerStage}`;
+            document.getElementById('question-text').innerText = `${q.id}. ${q.question}`;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const optionKeys = ['A', 'B', 'C', 'D'];
+            q.options.forEach((optText, idx) => {
+                const key = optionKeys[idx];
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<strong>${key}.</strong>&nbsp; ${optText}`;
+                btn.onclick = () => selectOption(btn, key);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Start 30-Second Countdown Timer
+            startTimer();
+        }
+
+        function startTimer() {
+            timeLeft = config.timePerQuestion;
+            const timerDisplay = document.getElementById('timer-count');
+            const timerBox = document.getElementById('timer-display');
+            
+            timerDisplay.innerText = timeLeft;
+            timerBox.classList.remove('warning');
+
+            questionTimer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.innerText = timeLeft;
+
+                if (timeLeft <= 5) {
+                    timerBox.classList.add('warning');
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(questionTimer);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function handleTimeOut() {
+            if (selectedOption !== null) return;
+            selectedOption = 'TIMEOUT';
+
+            const q = currentStageQuestions[currentQuestionIndex];
+            const allOptions = document.querySelectorAll('.option-btn');
+            const optionKeys = ['A', 'B', 'C', 'D'];
+
+            allOptions.forEach((btn, idx) => {
+                if (optionKeys[idx] === q.answer) {
+                    btn.classList.add('correct');
+                } else {
+                    btn.style.opacity = '0.5';
+                }
+            });
+
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function selectOption(btnElement, choiceKey) {
+            if (selectedOption !== null) return; // Prevent changing answer
+            clearInterval(questionTimer);
+
+            selectedOption = choiceKey;
+            const q = currentStageQuestions[currentQuestionIndex];
+            const isCorrect = choiceKey === q.answer;
+
+            const allOptions = document.querySelectorAll('.option-btn');
+            const optionKeys = ['A', 'B', 'C', 'D'];
+
+            allOptions.forEach((btn, idx) => {
+                if (optionKeys[idx] === q.answer) {
+                    btn.classList.add('correct');
+                } else if (optionKeys[idx] === choiceKey) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            if (isCorrect) {
+                currentStageScore += config.pointsPerQuestion;
+            }
+
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentStageQuestions.length) {
+                loadQuestion();
+            } else {
+                finishStage();
+            }
+        }
+
+        function finishStage() {
+            clearInterval(questionTimer);
+            if (!loggedInStudent) return;
+
+            const user = studentsDb[loggedInStudent];
+            user.stageScores[currentStage] = Math.max(user.stageScores[currentStage] || 0, currentStageScore);
+
+            // Calculate updated total score
+            user.totalScore = Object.values(user.stageScores).reduce((a, b) => a + b, 0);
+
+            // Unlock next stage if achieved
+            if (currentStage === user.unlockedStage && currentStage < config.totalStages) {
+                user.unlockedStage = currentStage + 1;
+            }
+
+            saveStudentsDb();
+
+            // Render Results Screen
+            document.getElementById('result-score').innerText = `You scored ${currentStageScore} / 50 points`;
+            
+            const nextBtn = document.getElementById('next-stage-btn');
+            if (currentStage < config.totalStages) {
+                nextBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.add('hidden');
+            }
+
+            renderDashboard();
+            renderStages();
+            renderTrophies();
+            showScreen('result-screen');
+        }
+
+        function startNextStage() {
+            if (currentStage < config.totalStages) {
+                startStage(currentStage + 1);
+            }
+        }
+
+        function exitQuiz() {
+            if (confirm("Are you sure you want to exit? Stage progress will not be saved.")) {
+                clearInterval(questionTimer);
+                showScreen('stages-screen');
+            }
+        }
+
+        // --- TROPHY SHOWCASE LOGIC ---
+        function renderTrophies() {
+            if (!loggedInStudent) return;
+            const user = studentsDb[loggedInStudent];
+            const container = document.getElementById('trophies-container');
+            container.innerHTML = '';
+
+            config.trophyThresholds.forEach(t => {
+                const isEarned = user.totalScore >= t.minScore;
+                const card = document.createElement('div');
+                card.style.display = 'flex';
+                card.style.alignItems = 'center';
+                card.style.padding = '1rem';
+                card.style.borderRadius = '8px';
+                card.style.border = '1px solid #e5e7eb';
+                card.style.backgroundColor = isEarned ? '#ecfdf5' : '#f9fafb';
+                card.style.opacity = isEarned ? '1' : '0.6';
+
+                card.innerHTML = `
+                    <div style="font-size: 2.5rem; margin-right: 1rem;">${t.icon}</div>
+                    <div style="flex: 1;">
+                        <h3 style="color: ${isEarned ? '#065f46' : '#374151'};">${t.trophy} ${isEarned ? 'Unlocked!' : ''}</h3>
+                        <p style="font-size: 0.85rem; color: #6b7280;">Score Range: ${t.minScore} - ${t.maxScore} pts</p>
+                    </div>
+                    <div>
+                        <strong style="color: ${isEarned ? '#10b981' : '#9ca3af'};">${isEarned ? 'EARNED' : 'LOCKED'}</strong>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- STUDENT-ADMIN MESSAGING SYSTEM ---
+        function renderStudentMessages() {
+            if (!loggedInStudent) return;
+            const chatBox = document.getElementById('student-chat-box');
+            chatBox.innerHTML = '';
+
+            const msgs = messagesDb[loggedInStudent] || [];
+            if (msgs.length === 0) {
+                chatBox.innerHTML = '<p style="text-align: center; color: #9ca3af; font-size: 0.85rem;">No messages yet. Send your query to the Admin below.</p>';
+                return;
+            }
+
+            msgs.forEach(m => {
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble ${m.sender}`;
+                bubble.innerHTML = `
+                    <div class="chat-meta">${m.sender === 'student' ? 'You' : 'Admin'} • ${m.time}</div>
+                    <div>${m.text}</div>
+                `;
+                chatBox.appendChild(bubble);
+            });
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendStudentMessage() {
+            if (!loggedInStudent) return;
+            const input = document.getElementById('student-msg-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            if (!messagesDb[loggedInStudent]) {
+                messagesDb[loggedInStudent] = [];
+            }
+
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            messagesDb[loggedInStudent].push({
+                sender: 'student',
+                text: text,
+                time: timeStr
+            });
+
+            localStorage.setItem('islamic_quiz_messages_db', JSON.stringify(messagesDb));
+            input.value = '';
+            renderStudentMessages();
+        }
+
+        // --- ADMIN PANEL & MESSAGING PORTION ---
+        function adminLogin() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === 'admin123' || pass === 'rasmedian') {
+                showScreen('admin-panel-screen');
+                document.getElementById('admin-pass').value = '';
+                populateAdminStudentSelect();
+            } else {
+                alert('Invalid Admin Password!');
+            }
+        }
+
+        function adminLogout() {
+            if (loggedInStudent) {
+                initAppForStudent(loggedInStudent);
+            } else {
+                showAuthScreen();
+            }
+        }
+
+        function populateAdminStudentSelect() {
+            const select = document.getElementById('admin-student-select');
+            select.innerHTML = '<option value="">-- Select a Student to View Messages --</option>';
+
+            Object.keys(studentsDb).forEach(username => {
+                const opt = document.createElement('option');
+                opt.value = username;
+                opt.innerText = `${studentsDb[username].firstName} (${studentsDb[username].gender}) - Score: ${studentsDb[username].totalScore} pts`;
+                select.appendChild(opt);
+            });
+
+            loadAdminChat();
+        }
+
+        function loadAdminChat() {
+            const username = document.getElementById('admin-student-select').value;
+            const chatBox = document.getElementById('admin-chat-box');
+            chatBox.innerHTML = '';
+
+            if (!username) {
+                chatBox.innerHTML = '<p style="text-align: center; color: #9ca3af; font-size: 0.85rem;">Select a student from the dropdown above to manage conversation.</p>';
+                return;
+            }
+
+            const msgs = messagesDb[username] || [];
+            if (msgs.length === 0) {
+                chatBox.innerHTML = `<p style="text-align: center; color: #9ca3af; font-size: 0.85rem;">No messages from ${username} yet.</p>`;
+                return;
+            }
+
+            msgs.forEach(m => {
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble ${m.sender === 'admin' ? 'student' : 'admin'}`;
+                bubble.innerHTML = `
+                    <div class="chat-meta">${m.sender === 'admin' ? 'You (Admin)' : username} • ${m.time}</div>
+                    <div>${m.text}</div>
+                `;
+                chatBox.appendChild(bubble);
+            });
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendAdminReply() {
+            const username = document.getElementById('admin-student-select').value;
+            const input = document.getElementById('admin-msg-input');
+            const text = input.value.trim();
+
+            if (!username) {
+                alert('Please select a student from the dropdown first.');
+                return;
+            }
+            if (!text) return;
+
+            if (!messagesDb[username]) {
+                messagesDb[username] = [];
+            }
+
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            messagesDb[username].push({
+                sender: 'admin',
+                text: text,
+                time: timeStr
+            });
+
+            localStorage.setItem('islamic_quiz_messages_db', JSON.stringify(messagesDb));
+            input.value = '';
+            loadAdminChat();
+        }
+
+        function resetAllData() {
+            if (confirm("Are you sure you want to reset ALL student progress across all accounts? This action cannot be undone.")) {
+                studentsDb = {};
+                messagesDb = {};
+                localStorage.removeItem('islamic_quiz_students_db');
+                localStorage.removeItem('islamic_quiz_messages_db');
+                localStorage.removeItem('islamic_quiz_current_student');
+                alert("All user data has been reset.");
+                location.reload();
+            }
+        }
+
+        function addQuestion() {
+            const stage = parseInt(document.getElementById('q-stage').value);
+            const text = document.getElementById('q-text').value;
+            const optA = document.getElementById('q-opt-a').value;
+            const optB = document.getElementById('q-opt-b').value;
+            const optC = document.getElementById('q-opt-c').value;
+            const optD = document.getElementById('q-opt-d').value;
+            const ans = document.getElementById('q-ans').value;
+
+            const newQ = {
+                stage: stage,
+                id: questions.length + 1,
+                question: text,
+                options: [optA, optB, optC, optD],
+                answer: ans
+            };
+
+            questions.push(newQ);
+            localStorage.setItem('islamic_quiz_questions', JSON.stringify(questions));
+
+            alert(`Question added successfully to Stage ${stage}!`);
+            document.getElementById('q-text').value = '';
+            document.getElementById('q-opt-a').value = '';
+            document.getElementById('q-opt-b').value = '';
+            document.getElementById('q-opt-c').value = '';
+            document.getElementById('q-opt-d').value = '';
+        }
+    </script>
+</body>
+</html>
